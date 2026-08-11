@@ -3,24 +3,47 @@
 
 
 /* Load a font from Google Fonts */
-@import url('https://fonts.googleapis.com/css?family=Work+Sans:400,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Varela+Round&display=swap');
+
 
 
 /* Rules for the whole page */
 
 body {
-  font-family: "Hoshiko Satsuki", sans-serif;
+  font-family: "Playfair Display", sans-serif;
   font-size: 18px;
-  line-height: 1.6;
-  background: #E0E7FF;   /* page background color — try changing this! */
+font-weight: 100;
+  line-height: 1;
+  background: #d0cbcb;   /* page background color — try changing this! */
   color: #333333;        /* text color */
   margin: 0;
+  text-align: left;
+  text-indent: 20px;
+  letter-spacing: 0cap;
+  line-height: 1em;
 }
 
 
 /* Headings */
 
-h1, h2, h3 {
+h1 {
+    font-family: "Varela Round", serif;
+    font-weight: 400;
+    font-size: 24px;
+  color: #1D1F50;
+}
+
+h2 {
+    font-family: "Varela Round", serif;
+    font-weight: 400;
+    font-size: 20px;
+  color: #1D1F50;
+}
+
+h3 {
+    font-family: "Varela Round", serif;
+    font-weight: 400;
+    font-size: 20px;
   color: #1D1F50;
 }
 
