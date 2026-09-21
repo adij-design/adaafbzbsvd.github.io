@@ -491,6 +491,46 @@ a.exp-company:hover{ opacity:.6; }
   padding:1.625rem 1.25rem;
   transition:background .35s ease;
 }
+.footer-live{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:0.75rem;
+  margin:0 auto 1.125rem;
+  color:var(--card-heading);
+}
+.live-card{
+  min-width:12.5rem;
+  border:0.0625rem solid var(--card-divider);
+  border-radius:1.125rem;
+  padding:0.875rem 1rem;
+  background:rgba(255,255,255,0.45);
+  text-align:left;
+}
+.live-label{
+  display:block;
+  font-size:0.6875rem;
+  font-weight:800;
+  line-height:1.2;
+  color:var(--card-date);
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+}
+.live-value{
+  display:block;
+  margin-top:0.3125rem;
+  font-size:1rem;
+  font-weight:800;
+  line-height:1.25;
+}
+.live-meta{
+  display:block;
+  margin-top:0.1875rem;
+  font-size:0.75rem;
+  line-height:1.4;
+  color:var(--card-text);
+}
 .social-row{ display:flex; align-items:center; justify-content:center; gap:0.875rem; }
 .icon-btn{
   width:2.625rem; height:2.625rem;
@@ -613,6 +653,8 @@ a.exp-company:hover{ opacity:.6; }
   .cta-decoration{ display:none; }
 
   .site-footer{ padding:1.375rem 1rem; }
+  .footer-live{ align-items:stretch; }
+  .live-card{ flex:1 1 100%; min-width:0; text-align:center; }
   .icon-btn{ width:2.375rem; height:2.375rem; }
 }
 
@@ -724,6 +766,18 @@ a.exp-company:hover{ opacity:.6; }
 </main>
 
 <footer class="site-footer">
+  <div class="footer-live" aria-label="Delhi time and weather">
+    <div class="live-card">
+      <span class="live-label">Delhi, India time</span>
+      <span class="live-value" id="indiaTime">Loading...</span>
+      <span class="live-meta" id="indiaDate">IST</span>
+    </div>
+    <div class="live-card">
+      <span class="live-label">Delhi weather</span>
+      <span class="live-value" id="weatherTemp">Loading...</span>
+      <span class="live-meta" id="weatherCondition">Open-Meteo</span>
+    </div>
+  </div>
   <div class="social-row">
     <a class="icon-btn" href="https://x.com" target="_blank" rel="noopener" aria-label="X (Twitter)">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2H21.5l-7.36 8.41L23 22h-6.828l-5.35-6.99L4.7 22H1.44l7.86-8.99L1 2h7l4.84 6.39L18.244 2zM17.02 20h1.9L7.06 3.9H5.02L17.02 20z"/></svg>
@@ -866,6 +920,79 @@ form.addEventListener('submit', (e) => {
   form.reset();
   showToast(`Thanks ${name.split(' ')[0]}! Your message has been sent.`);
 });
+
+// ---------- DELHI TIME + WEATHER ----------
+const indiaTimeEl = document.getElementById('indiaTime');
+const indiaDateEl = document.getElementById('indiaDate');
+const weatherTempEl = document.getElementById('weatherTemp');
+const weatherConditionEl = document.getElementById('weatherCondition');
+
+function updateIndiaTime(){
+  const now = new Date();
+  indiaTimeEl.textContent = new Intl.DateTimeFormat('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  }).format(now);
+  indiaDateEl.textContent = new Intl.DateTimeFormat('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    timeZoneName: 'short'
+  }).format(now);
+}
+
+function describeWeather(code){
+  const weatherMap = {
+    0: 'Clear sky',
+    1: 'Mainly clear',
+    2: 'Partly cloudy',
+    3: 'Overcast',
+    45: 'Fog',
+    48: 'Rime fog',
+    51: 'Light drizzle',
+    53: 'Drizzle',
+    55: 'Heavy drizzle',
+    61: 'Light rain',
+    63: 'Rain',
+    65: 'Heavy rain',
+    71: 'Light snow',
+    73: 'Snow',
+    75: 'Heavy snow',
+    80: 'Light showers',
+    81: 'Showers',
+    82: 'Heavy showers',
+    95: 'Thunderstorm',
+    96: 'Thunderstorm with hail',
+    99: 'Heavy thunderstorm with hail'
+  };
+  return weatherMap[code] || 'Weather update';
+}
+
+async function loadDelhiWeather(){
+  const weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=28.61&longitude=77.21&current=temperature_2m,weather_code,is_day&timezone=auto';
+  try {
+    const response = await fetch(weatherUrl);
+    if (!response.ok) throw new Error('Weather request failed');
+    const data = await response.json();
+    const current = data.current;
+    const tempUnit = data.current_units?.temperature_2m || 'C';
+    const formattedUnit = tempUnit.includes('°') ? tempUnit : `°${tempUnit}`;
+    weatherTempEl.textContent = `${Math.round(current.temperature_2m)}${formattedUnit}`;
+    weatherConditionEl.textContent = `${describeWeather(current.weather_code)} in Delhi`;
+  } catch (error) {
+    weatherTempEl.textContent = 'Weather unavailable';
+    weatherConditionEl.textContent = 'Please try again later';
+  }
+}
+
+updateIndiaTime();
+setInterval(updateIndiaTime, 1000);
+loadDelhiWeather();
+setInterval(loadDelhiWeather, 15 * 60 * 1000);
 </script>
 </body>
 </html>
